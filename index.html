@@ -529,7 +529,7 @@ function drawTopA(c,p){
   var ca=ease(seg(p,0,.22));
   if(ca>0){
     c.save();c.globalAlpha*=ca;var k=.94+.06*ca;c.translate(540,590);c.scale(k,k);c.translate(-540,-590);
-    if(ok(A.cont))c.drawImage(A.cont,23,21.1,1034,1034);
+    if(ok(A.cont))c.drawImage(A.cont,-4,-74,1080,1080);
     else{
       c.save();c.shadowColor='rgba(0,0,0,.4)';c.shadowBlur=40;c.fillStyle='rgba(20,33,74,.78)';rr(c,66,105,948,785,72);c.fill();c.restore();
       c.strokeStyle='rgba(163,191,232,.55)';c.lineWidth=3;rr(c,66,105,948,785,72);c.stroke();
@@ -539,26 +539,20 @@ function drawTopA(c,p){
       titleLine(c,'WRAPPED',520,860,['#dfeaff','#8fb0ff'],1);
       titleLine(c,'2026',745,860,['#8fb0ff','#506CCE'],1);
     }
-    if(ok(A.texto))c.drawImage(A.texto,23,21.1,1034,1034);
+    if(ok(A.texto))c.drawImage(A.texto,2,-27,1064,1064);
     c.restore();
   }
-  if(state.photo||!ok(A.texto)){
-    var big=!ok(A.texto);
-    c.save();if(!big){c.translate(915,890);c.rotate(.1);c.translate(-915,-890)}
-    if(big)drawPhotoFrame(c,308,293,464,easeBack(seg(p,.1,.36)),ease(seg(p,.1,.26)));
-    else drawPhotoFrame(c,800,775,230,easeBack(seg(p,.1,.36)),ease(seg(p,.1,.26)));
-    c.restore();
-  }
+  drawPhotoFrame(c,293,258,464,easeBack(seg(p,.1,.36)),ease(seg(p,.1,.26)));
 }
 function drawTopB(c,p){
   var nm=dispName()+',',tail=' '+T('subTail').replace(/\.$/,'').replace(/'/g,'’'),size=45.5;
   function meas(s){c.font=F(900,s);var w=c.measureText(nm).width;c.font=F(400,s);return w+c.measureText(tail).width}
-  var lim=(state.photo&&ok(A.texto))?680:906;while(meas(size)>lim&&size>24)size-=1;
+  while(meas(size)>906&&size>24)size-=1;
   appear(c,ease(seg(p,.34,.5)),22,function(){
-    c.textAlign='left';c.textBaseline='middle';c.fillStyle=ED;c.font=F(900,size);c.fillText(nm,92,961);
-    var w=c.measureText(nm).width;c.font=F(400,size);c.fillText(tail,92+w,961);
+    c.textAlign='left';c.textBaseline='middle';c.fillStyle=ED;c.font=F(900,size);c.fillText(nm,92,905);
+    var w=c.measureText(nm).width;c.font=F(400,size);c.fillText(tail,92+w,905);
   });
-  var wp=ease(seg(p,.42,.62));if(wp>0)drawWord(c,state.word.toUpperCase(),92,1098,906,134,'left',wp);
+  var wp=ease(seg(p,.42,.62));if(wp>0)drawWord(c,state.word.toUpperCase(),92,1062,906,134,'left',wp);
 }
 function drawCard(c,p,t){
   var ta=ease(seg(p,0,.25));
