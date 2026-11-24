@@ -247,7 +247,7 @@ function areaKey(txt){
 var FOUNDER_RE=/(^| )(ceo|cto|coo|cfo|fundador|fundadora|founder|cofundador|cofundadora)( |$)/;
 function personToMatch(p,email){
   var parts=String(p.country||'').split(/[,;\/|&+]| y | and /i).map(function(x){return norm(x)}).filter(Boolean),c=parts.length===1?(CKEYS[parts[0]]||''):'';
-  return {founder:FOUNDER_RE.test(norm(p.area||'')),name:p.name,email:email,start:p.start||'',area:areaKey(p.area),country:c,msg:{es:p.msg&&p.msg.es||'',en:p.msg&&p.msg.en||''},shine:{es:p.shine&&p.shine.es||'',en:p.shine&&p.shine.en||''}};
+  return {founder:FOUNDER_RE.test(norm(p.area||'')),name:p.name,email:email,start:p.start||'',area:areaKey(p.area),country:c,msg:{es:p.msg&&p.msg.es||'',en:p.msg&&p.msg.en||''},shine:{es:p.shine&&p.shine.es||'',en:p.shine&&p.shine.en||''},logro:String(p.logro||'').trim()};
 }
 function lookupPerson(){
   var local=findMatch();if(local)return Promise.resolve({m:local});
@@ -280,7 +280,7 @@ function generate(){
 function buildStats(){
   var L='es',P=CFG.pools.es,pk=state.pick,mt=state.match;if(!pk)return;
   state.word=state.wordCustom||CFG.words.es[pk.word];
-  if(isF()){var stf=[],shf=mt.shine&&(mt.shine.es||'');stf.push({icon:'ar',text:T('impactArF')});stf.push({icon:'evo',text:T('evoText').replace('{n}',CFG.comercios)});if(shf){shf=String(shf).trim().replace(/\*+/g,'');stf.push({icon:'star',text:T('milestone')+' **'+shf+'**'})}state.stats=stf;state.msg=messageFor();return}
+  if(isF()){var stf=[],shf=mt.shine&&(mt.shine.es||'');stf.push({icon:'ar',text:T('impactArF')});stf.push({icon:'evo',text:T('evoText').replace('{n}',CFG.comercios)});if(shf){shf=String(shf).trim().replace(/\*+/g,'');stf.push({icon:'star',text:T('milestone')+' **'+shf+'**'})}var lgf=String(mt.logro||'').trim().replace(/\*+/g,'');if(lgf)stf.push({icon:'trend',text:'Logro del año: **'+lgf+'**'});state.stats=stf;state.msg=messageFor();return}
   var st=[];
   st.push({icon:'ar',text:T('impactAr')});
   var cm=CFG.comercios;st.push({icon:'evo',text:T('evoText').replace('{n}',cm)});
@@ -290,8 +290,10 @@ function buildStats(){
   var sh=mt&&mt.shine&&(mt.shine.es||'');
   if(sh){sh=String(sh).trim().replace(/\*+/g,'');st.push({icon:'star',text:'Te luciste con **'+sh+'**'})}
   else st.push({icon:'star',text:fill(P.skills[si])});
+  var lg=String(mt&&mt.logro||'').trim().replace(/\*+/g,'');
+  if(lg)st.push({icon:'trend',text:'Logro del año: **'+lg+'**'});
   var mo=monthsTogether(mt?mt.start:'');
-  if(mo>0)st.push({icon:'trend',text:'',count:{n:mo,tpl:function(k){return T(k===1?'monthsOne':'monthsMany').replace('{n}',k)}}});
+  if(mo>0)st.push({icon:'cal',text:'',count:{n:mo,tpl:function(k){return T(k===1?'monthsOne':'monthsMany').replace('{n}',k)}}});
   state.stats=st;state.msg=messageFor();
 }
 function statText(s,prog){return s.count?s.count.tpl(Math.round(s.count.n*prog)):s.text}
@@ -454,7 +456,16 @@ function evoIcon(c,cx,cy,d){
   c.font=EF(34*u);c.fillText('🦴',-24*u,-2*u);c.font=EF(34*u);c.fillText('💼',25*u,-2*u);
   c.strokeStyle='#fff';c.lineWidth=5*u;c.lineCap='round';c.lineJoin='round';c.beginPath();c.moveTo(-8*u,26*u);c.lineTo(10*u,26*u);c.moveTo(4*u,20*u);c.lineTo(10*u,26*u);c.lineTo(4*u,32*u);c.stroke();c.restore();
 }
+function calIcon(c,cx,cy,d){
+  c.save();var w=d*.74,h=d*.7,x=cx-w/2,y=cy-h/2+d*.05;
+  c.fillStyle='#EAF0FF';rr(c,x,y,w,h,d*.1);c.fill();
+  c.fillStyle='#4E6BE0';rr(c,x,y,w,h*.3,d*.1);c.fill();c.fillRect(x,y+h*.15,w,h*.15);
+  c.fillStyle='#2A3A8C';[.3,.7].forEach(function(f){rr(c,x+w*f-d*.03,y-d*.07,d*.06,d*.15,d*.03);c.fill()});
+  c.fillStyle='#4E6BE0';for(var r=0;r<2;r++)for(var q=0;q<3;q++){rr(c,x+w*(.17+q*.27),y+h*(.46+r*.28),w*.17,h*.16,d*.025);c.fill()}
+  c.restore();
+}
 function drawIcon(c,key,cx,cy,s){
+  if(key==='cal'){calIcon(c,cx,cy,s);return}
   var ak={ar:'bandera',rocket:'nave',star:'estrella',evo:'evo',trend:'trend'}[key],im=ak&&A[ak];
   if(ok(im)){c.drawImage(im,cx-s/2,cy-s/2,s,s);return}
   if(key==='ar')flagAR(c,cx,cy,s*.9);
